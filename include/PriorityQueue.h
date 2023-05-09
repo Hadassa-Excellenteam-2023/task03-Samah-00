@@ -1,31 +1,35 @@
-#pragma once
+#include <list>
+#include <stdexcept>
+#include <functional>
 
-#include <iostream>
-#include <list>
-#include <exception>
-#include <list>
+template <typename T>
+struct MyComparator {
+    bool operator()(const T& a, const T& b) const {
+        return a < b;
+    }
+};
 
 template <typename T>
 class PriorityQueue {
 public:
     void push(const T& t) {
-        typename std::list<T>::iterator it = m_data.begin();
-        while (it != m_data.end() && *it < t) {
+        auto it = m_queue.begin();
+        while (it != m_queue.end() && comp(*it, t)) {
             ++it;
         }
-        m_data.insert(it, t);
+        m_queue.insert(it, t);
     }
 
     T poll() {
-        if (m_data.empty()) {
-            throw std::exception("Queue is empty!");
+        if (m_queue.empty()) {
+            throw std::out_of_range("Priority queue is empty!");
         }
-        T front = m_data.front();
-        m_data.pop_front();
-        return front;
+        T result = m_queue.front();
+        m_queue.pop_front();
+        return result;
     }
 
 private:
-    std::list<T> m_data;
+    std::list<T> m_queue;
+    MyComparator<T> comp;
 };
-
